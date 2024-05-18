@@ -30,7 +30,20 @@ sed -i 's|weight != 1.0|(float)weight != 1.0f|' opencv/modules/dnn/src/cuda4dnn/
 sed -i 's|nms_iou_threshold > 0|(float)nms_iou_threshold > 0.0f|' opencv/modules/dnn/src/cuda4dnn/primitives/region.hpp
 grep 'weight' opencv/modules/dnn/src/cuda4dnn/primitives/normalize_bbox.hpp
 grep 'nms_iou_threshold' opencv/modules/dnn/src/cuda4dnn/primitives/region.hpp
-    
+
+unzip -j /tmp/opencv/Video_Codec_SDK_${VIDEOSDK_VERSION}.zip \
+          Video_Codec_SDK_${VIDEOSDK_VERSION}/Interface/cuviddec.h \
+          Video_Codec_SDK_${VIDEOSDK_VERSION}/Interface/nvcuvid.h \
+          Video_Codec_SDK_${VIDEOSDK_VERSION}/Interface/nvEncodeAPI.h \
+          -d /usr/local/cuda/include && \
+unzip -j /tmp/opencv/Video_Codec_SDK_${VIDEOSDK_VERSION}.zip \
+      Video_Codec_SDK_${VIDEOSDK_VERSION}/Lib/linux/stubs/aarch64/libnvcuvid.so \
+      Video_Codec_SDK_${VIDEOSDK_VERSION}/Lib/linux/stubs/aarch64/libnvidia-encode.so \
+      -d /usr/local/cuda/lib64/stubs && \
+      rm Video_Codec_SDK_${VIDEOSDK_VERSION}.zip
+      
+echo "/usr/local/cuda/lib64/stubs\n" > /etc/ld.so.conf.d/900_video-extractor.conf && ldconfig
+
 export ENABLE_CONTRIB=1
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 export CMAKE_ARGS="\
@@ -56,6 +69,11 @@ export CMAKE_ARGS="\
    -DWITH_CUBLAS=ON \
    -DWITH_CUDA=ON \
    -DWITH_CUDNN=ON \
+      -D WITH_NVCUVENC=ON \
+      -D WITH_NVCUVID=ON \
+      -D ENABLE_CUDA_FIRST_CLASS_LANGUAGE=ON\
+      -D CUDA_nvcuvid_LIBRARY=/usr/local/cuda/lib64/stubs/libnvcuvid.so.1 \
+      -D CUDA_nvidia-encode_LIBRARY=/usr/local/cuda/lib64/stubs/libnvidia-encode.so.1 \
    -DWITH_GSTREAMER=ON \
    -DWITH_LIBV4L=ON \
    -DWITH_GTK=ON \
