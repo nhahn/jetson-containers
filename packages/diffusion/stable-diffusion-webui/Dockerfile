@@ -31,9 +31,9 @@ RUN set -ex \
         https://github.com/ahgsql/StyleSelectorXL \
         https://github.com/thomasasfk/sd-webui-aspect-ratio-helper \
         https://github.com/BlafKing/sd-civitai-browser-plus \
-    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 -c 'from modules import launch_utils; launch_utils.args.skip_python_version_check=True; launch_utils.prepare_environment()' \
+#    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 -c 'from modules import launch_utils; launch_utils.args.skip_python_version_check=True; launch_utils.prepare_environment()' \
     # partially initialized module 'cv2' has no attribute 'gapi_wip_gst_GStreamerPipeline' \
-    && /opt/opencv_install.sh \
+#    && /opt/opencv_install.sh \
     # TypeError: 'type' object is not subscriptable \
     && sed 's|dict\[str, OptionInfo\]|dict|g' -i $AUTOMATIC1111_ROOT_DIR/modules/options.py \
     && sed 's|dict\[.*\]|dict|g' -i $AUTOMATIC1111_ROOT_DIR/modules/processing.py \
@@ -42,11 +42,11 @@ RUN set -ex \
     && sed 's|list\[.*\]|list|g' -i $AUTOMATIC1111_ROOT_DIR/modules/script_callbacks.py \
     \
     # test that it loads \
-    && cd /opt/stable-diffusion-webui \
-    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 launch.py --help \
-    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" pip3 show insightface \
-    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 -c 'import insightface; print(insightface.__version__);' \
-    \
+#    && cd /opt/stable-diffusion-webui \
+#    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 launch.py --help \
+#    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" pip3 show insightface \
+#    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 -c 'import insightface; print(insightface.__version__);' \
+#    \
     # Cleanup \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean

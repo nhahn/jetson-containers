@@ -4,14 +4,23 @@ echo "Building opencv-python ${OPENCV_VERSION}"
 
 bash /tmp/opencv/install_deps.sh
 
-cd /opt
+git clone --branch ${OPENCV_PYTHON} --recursive https://github.com/opencv/opencv-python /opt/opencv-python
 
-git clone --branch ${OPENCV_VERSION} --recursive https://github.com/opencv/opencv.git /opt/opencv
-git clone --branch ${OPENCV_VERSION} --recursive https://github.com/opencv/opencv_contrib.git /opt/opencv_contrib
+cd /opt/opencv-python/opencv
+git checkout --recurse-submodules ${OPENCV_VERSION}
+cat modules/core/include/opencv2/core/version.hpp
+
+cd ../opencv_contrib
+git checkout --recurse-submodules ${OPENCV_VERSION}
+
+cd ../opencv_extra
+git checkout --recurse-submodules ${OPENCV_VERSION}
+
+cd ../
 
 # apply patches to setup.py
-# git apply /tmp/opencv/patches.diff || echo "failed to apply git patches"
-# git diff
+git apply /tmp/opencv/patches.diff || echo "failed to apply git patches"
+git diff
 
 # OpenCV looks for the cuDNN version in cudnn_version.h, but it's been renamed to cudnn_version_v8.h
 ln -s /usr/include/$(uname -i)-linux-gnu/cudnn_version_v*.h /usr/include/$(uname -i)-linux-gnu/cudnn_version.h
@@ -25,7 +34,6 @@ grep 'nms_iou_threshold' opencv/modules/dnn/src/cuda4dnn/primitives/region.hpp
 export ENABLE_CONTRIB=1
 export CMAKE_BUILD_PARALLEL_LEVEL=$(nproc)
 export CMAKE_ARGS="\
-   -DCMAKE_BUILD_TYPE=Release \
    -DCPACK_BINARY_DEB=ON \
    -DBUILD_EXAMPLES=OFF \
    -DBUILD_opencv_python2=OFF \
@@ -42,12 +50,14 @@ export CMAKE_ARGS="\
    -DENABLE_NEON=ON \
    -DOPENCV_DNN_CUDA=ON \
    -DOPENCV_ENABLE_NONFREE=ON \
-   -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib/modules \
+   -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv-python/opencv_contrib/modules \
    -DOPENCV_GENERATE_PKGCONFIG=ON \
    -DOpenGL_GL_PREFERENCE=GLVND \
    -DWITH_CUBLAS=ON \
    -DWITH_CUDA=ON \
    -DWITH_CUDNN=ON \
+   -DWITH_GSTREAMER=ON \
+   -DWITH_LIBV4L=ON \
    -DWITH_GTK=ON \
    -DWITH_OPENGL=OFF \
    -DWITH_OPENCL=OFF \
@@ -57,16 +67,12 @@ export CMAKE_ARGS="\
    -DBUILD_PERF_TESTS=OFF \
    -DBUILD_TESTS=OFF"
 
-mkdir -p /opt/opencv/build
-cd /opt/opencv/build
-cmake ${CMAKE_ARGS} ..
+pip3 wheel --wheel-dir=/opt --verbose .
 
- CFLAGS=-Wno-error make -j`nproc` && \
- CFLAGS=-Wno-error make install && \
-    ldconfig && \
-    ln -s /usr/local/lib/python3.10/site-packages/cv2 /usr/local/lib/python3.10/dist-packages/cv2 && \
-    cd /opt && \
-    rm -rf opencv opencv_contrib
+ls /opt
+cd /
+rm -rf /opt/opencv-python
 
+pip3 install --no-cache-dir --verbose /opt/opencv*.whl
 python3 -c "import cv2; print('OpenCV version:', str(cv2.__version__)); print(cv2.getBuildInformation())"
-
+twine upload --verbose /opt/opencv*.whl || echo "failed to upload wheel to ${TWINE_REPOSITORY_URL}"

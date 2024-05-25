@@ -11,10 +11,13 @@ FROM ${BASE_IMAGE}
 
 ARG GOBIN=/opt/go/bin
 
+RUN echo "deb [ allow-insecure=yes ] https://repo.download.nvidia.com/jetson/ffmpeg main main" | tee -a /etc/apt/sources.list \
+    && echo "deb-src [ allow-insecure=yes ] https://repo.download.nvidia.com/jetson/ffmpeg main main" | tee -a /etc/apt/sources.list
+
 # Install ffmpeg
 RUN set -ex \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends ffmpeg \
+	&& apt update \
+	&& apt install -y --no-install-recommends ffmpeg \
 	&& apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

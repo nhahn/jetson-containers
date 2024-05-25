@@ -15,7 +15,6 @@ ARG OPENCV_VERSION \
     CUDA_ARCH_BIN \
     FORCE_BUILD=off
 
-ENV VIDEOSDK_VERSION 12.1.14    
 ENV OPENCV_VERSION=${OPENCV_VERSION} \
     OPENCV_URL=${OPENCV_URL}
     
@@ -25,8 +24,7 @@ COPY build.sh \
      install_deb.sh \
      install_pip.sh \
      patches.diff \
-     Video_Codec_SDK_${VIDEOSDK_VERSION}.zip \
-	/tmp/opencv/
+     /tmp/opencv/
 
 RUN cd /tmp/opencv && ./install.sh || ./build.sh
 
