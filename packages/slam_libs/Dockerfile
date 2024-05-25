@@ -2,7 +2,7 @@
 #---
 # name: slam_libs
 # group: robotics
-# depends: [opencv:4.9.0-builder, numpy, ros:humble-ros-base]
+# depends: [ffmpeg, opencv:4.9.0-builder, numpy, ros:humble-ros-base]
 # notes: installs ffmpeg
 # test: test.sh
 #---
