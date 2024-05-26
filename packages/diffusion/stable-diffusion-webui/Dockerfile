@@ -33,7 +33,7 @@ RUN set -ex \
         https://github.com/BlafKing/sd-civitai-browser-plus \
 #    && PYTHONPATH="$AUTOMATIC1111_ROOT_DIR" python3 -c 'from modules import launch_utils; launch_utils.args.skip_python_version_check=True; launch_utils.prepare_environment()' \
     # partially initialized module 'cv2' has no attribute 'gapi_wip_gst_GStreamerPipeline' \
-#    && /opt/opencv_install.sh \
+    # && /opt/opencv_install.sh \
     # TypeError: 'type' object is not subscriptable \
     && sed 's|dict\[str, OptionInfo\]|dict|g' -i $AUTOMATIC1111_ROOT_DIR/modules/options.py \
     && sed 's|dict\[.*\]|dict|g' -i $AUTOMATIC1111_ROOT_DIR/modules/processing.py \

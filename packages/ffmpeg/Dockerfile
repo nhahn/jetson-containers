@@ -17,15 +17,16 @@ ADD --chown=root:root https://repo.download.nvidia.com/jetson/jetson-ota-public.
 RUN chmod 644 /etc/apt/trusted.gpg.d/jetson-ota-public.asc \
     && apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
-    && echo "deb https://repo.download.nvidia.com/jetson/common main main" > /etc/apt/sources.list.d/nvidia-l4t-apt-source.list \
-    && echo "deb https://repo.download.nvidia.com/jetson/${SOC} main main" >> /etc/apt/sources.list.d/nvidia-l4t-apt-source.list \
+    && echo "deb https://repo.download.nvidia.com/jetson/common main main" > /etc/apt/sources.list.d/ffmpeg-source.list \
+    && echo "deb https://repo.download.nvidia.com/jetson/${SOC} main main" >> /etc/apt/sources.list.d/ffmpeg-source.list
 
 # Install ffmpeg
 RUN set -ex \
 	&& apt-get update \
 	&& apt-get install -y --no-install-recommends ffmpeg \
 	&& apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm /etc/apt/sources.list.d/ffmpeg-source.list
 
 # set Go env variables
 ENV GOPATH=/opt/go \
@@ -36,3 +37,4 @@ RUN set -ex \
 	&& ffmpeg -version \
 	&& ffmpeg -encoders \
 	&& ffmpeg -decoders
+
